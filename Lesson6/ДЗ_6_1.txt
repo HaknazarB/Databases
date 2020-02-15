@@ -1,0 +1,23 @@
+-- DROP TABLE young;
+CREATE TEMPORARY TABLE IF NOT EXISTS young
+	SELECT 
+		user_id,
+		(SELECT 
+			birthdate 
+		FROM 
+			profiles 
+			WHERE user_id = likes.user_id) AS birthdate ,  
+		COUNT(*) as likes
+	FROM 
+		likes 
+			GROUP BY user_id
+			ORDER BY birthdate DESC
+			LIMIT 10;
+
+SELECT SUM(likes) AS likes 
+FROM 
+	young
+ 
+ 
+ 
+ 
