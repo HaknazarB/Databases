@@ -1,0 +1,19 @@
+CREATE TEMPORARY TABLE activity
+(SELECT user_id AS users, COUNT(created_at) AS last_like, 0 AS last_post, 0 AS last_message
+	FROM 
+		likes
+		GROUP BY user_id)
+			UNION 
+	
+(SELECT user_id AS users,  0, COUNT(created_at ) AS last_post, 0
+	FROM 
+		posts
+		GROUP BY user_id)
+			UNION
+(SELECT from_user_id AS users, 0, 0, COUNT(created_at ) AS last_messages 
+	FROM 
+		messages
+		GROUP BY from_user_id);
+
+SELECT users, (SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE users.id=activity.users) AS name, SUM(last_like) AS likes, SUM(last_post) AS posts, SUM(last_message) AS messages, SUM(last_like)+SUM(last_post)+SUM(last_message) AS activ_all  FROM activity
+GROUP BY users ORDER BY activ_all LIMIT 10;
