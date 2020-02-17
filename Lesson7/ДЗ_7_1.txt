@@ -1,0 +1,17 @@
+INSERT INTO 
+	orders 
+VALUES 
+	(NULL, 2, NULL, NULL), 
+	(NULL, 4, NULL, NULL);
+
+SELECT 
+	(SELECT 
+		name 
+	FROM 
+		users 
+		WHERE 
+			id = orders.user_id) AS customers,
+			COUNT(*) AS order_quantity 
+FROM orders
+	GROUP BY customers; 
+ 
