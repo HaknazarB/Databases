@@ -1,0 +1,10 @@
+SELECT 
+	name as product_name, 
+	(SELECT 
+		name 
+	FROM 
+		catalogs 
+			WHERE 
+				id = products.catalog_id) AS catalog_name
+FROM products
+	ORDER BY catalog_name;
