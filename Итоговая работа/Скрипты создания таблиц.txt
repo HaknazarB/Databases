@@ -1,0 +1,109 @@
+-- Создаём БД
+CREATE DATABASE report_service;
+
+-- Делаем её текущей
+USE report_service;
+
+-- Создаём таблицу отчетов
+CREATE TABLE reports (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(100) NOT NULL,
+  ref_id INT VARCHAR(20) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Создаём таблицу компаний
+CREATE TABLE companies(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  tax_num VARCHAR(12) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Создаём таблицу аккаунтов
+CREATE TABLE accounts (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  login VARCHAR(15) NOT NULL UNIQUE,
+  company_id INT unsigned not null,
+  email VARCHAR(120) NOT NULL UNIQUE,
+  activity BOOLEAN,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+-- Создаём таблицу пользователей
+CREATE TABLE users (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  account_id INT unsigned not null,
+  email VARCHAR(120) NOT NULL UNIQUE,
+  phone VARCHAR(15) NOT NULL UNIQUE,
+  login VARCHAR(15) NOT NULL UNIQUE,
+  `password` VARCHAR(15),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Создаём таблицу конфигураций
+CREATE TABLE configs (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  version INT unsigned not null,
+  reg_num INT unsigned not null,
+  activity BOOLEAN,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Создаём таблицу связей конфигураций и аккаунтов
+CREATE TABLE company_configs (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  config_id INT unsigned not null,
+  account_id INT unsigned not null
+  );
+
+-- Создаём таблицу сообщений от сервера ИТС
+CREATE TABLE ITS_messages (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  code INT unsigned not null,
+  desription VARCHAR(200) NOT NULL
+  );
+
+-- Создаём таблицу типов данных
+CREATE TABLE data_types (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  desription VARCHAR(20) NOT NULL
+  );
+
+-- Создаём таблицу ячеек
+CREATE TABLE cells (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(20) NOT NULL, foreign key
+  ext_name VARCHAR(20) NOT NULL, foreign key
+  report_id INT unsigned not null
+  );
+
+-- Создаём первичную таблицу данных
+CREATE TABLE data_table (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  data_type_id INT unsigned not null,
+  report_id INT unsigned not null,
+  account_id INT unsigned not null,
+  data VARCHAR(200) NOT NULL,
+  cell_name VARCHAR(20) NOT NULL, foreign key
+  );
+
+-- Создаём таблицу данных готового отчета
+CREATE TABLE data_report_ready (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  data_type_id INT unsigned not null,
+  report_id INT unsigned not null,
+  account_id INT unsigned not null,
+  data VARCHAR(200) NOT NULL,
+  cell_ext_name VARCHAR(20) NOT NULL, foreign key
+  );
