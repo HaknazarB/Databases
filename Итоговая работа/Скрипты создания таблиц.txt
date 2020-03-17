@@ -1,0 +1,205 @@
+-- ??????? ??
+CREATE DATABASE report_service;
+
+-- ?????? ?? ???????
+USE report_service;
+
+-- ??????? ??????? ???????
+CREATE TABLE reports (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(100) NOT NULL,
+  ref_id INT(20) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ??????? ??????? ????????
+CREATE TABLE companies(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  tax_num VARCHAR(12) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ??????? ??????? ?????????
+CREATE TABLE accounts (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  login VARCHAR(15) NOT NULL UNIQUE,
+  company_id INT unsigned not null,
+  email VARCHAR(120) NOT NULL UNIQUE,
+  activity BOOLEAN,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ????????? ??????? ????
+ALTER TABLE accounts 
+ADD CONSTRAINT fk_company_id
+FOREIGN KEY (company_id) 
+REFERENCES companies (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+ 
+
+-- ??????? ??????? ?????????????
+CREATE TABLE users (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  account_id INT(10) unsigned not null,
+  email VARCHAR(120) NOT NULL UNIQUE,
+  phone VARCHAR(15) NOT NULL UNIQUE,
+  login VARCHAR(15) NOT NULL UNIQUE,
+  `password` VARCHAR(15),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ????????? ??????? ????
+ALTER TABLE users 
+ADD CONSTRAINT fk_account_id
+FOREIGN KEY (account_id) 
+REFERENCES accounts (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+-- ??????? ??????? ????????????
+CREATE TABLE configs (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  version INT(10) unsigned not null,
+  reg_num INT(15) unsigned not null,
+  activity BOOLEAN,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ??????? ??????? ?????? ???????????? ? ?????????
+CREATE TABLE company_configs (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  config_id INT unsigned not null,
+  account_id INT unsigned not null
+  );
+ 
+ -- ????????? ??????? ????
+ALTER TABLE company_configs 
+ADD CONSTRAINT fk_config_id
+FOREIGN KEY (config_id) 
+REFERENCES configs (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+ALTER TABLE company_configs 
+ADD FOREIGN KEY (account_id) 
+REFERENCES accounts (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE;
+
+-- ??????? ??????? ????????? ?? ??????? ???
+CREATE TABLE ITS_messages (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  code INT unsigned not null,
+  desription VARCHAR(200) NOT NULL
+  );
+
+-- ??????? ??????? ????? ??????
+CREATE TABLE data_types (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  desription VARCHAR(20) NOT NULL
+  );
+
+-- ??????? ??????? ?????
+CREATE TABLE cells (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(20) NOT NULL, 
+  ext_name VARCHAR(20) NOT NULL,
+  report_id INT unsigned not null
+  );
+ 
+ -- ????????? ?????? ?? ???????????? ??????
+ CREATE INDEX cells_name_idx ON cells (name);
+
+ -- ????????? ?????? ?? ???????????? ??????? ??????
+ CREATE INDEX cells_ext_name_idx ON cells (ext_name);
+ 
+  -- ????????? ??????? ????
+ALTER TABLE cells
+ADD FOREIGN KEY (report_id) 
+REFERENCES reports (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+ 
+
+-- ??????? ????????? ??????? ??????
+CREATE TABLE data_table (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  data_type_id INT unsigned not null,
+  report_id INT unsigned not null,
+  account_id INT unsigned not null,
+  data VARCHAR(200) NOT NULL,
+  cell_name VARCHAR(20) NOT NULL
+  );
+ 
+   -- ????????? ??????? ????
+ALTER TABLE data_table
+ADD FOREIGN KEY (report_id) 
+REFERENCES reports (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+ALTER TABLE data_table
+ADD FOREIGN KEY (data_type_id) 
+REFERENCES data_types (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+ALTER TABLE data_table
+ADD FOREIGN KEY (account_id) 
+REFERENCES accounts (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+ALTER TABLE data_table
+ADD CONSTRAINT fk_cell_name
+FOREIGN KEY (cell_name) 
+REFERENCES cells (name)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+-- ??????? ??????? ?????? ???????? ??????
+CREATE TABLE data_report_ready (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  data_type_id INT unsigned not null,
+  report_id INT unsigned not null,
+  account_id INT unsigned not null,
+  data VARCHAR(200) NOT NULL,
+  cell_ext_name VARCHAR(20) NOT NULL
+  );
+  
+    -- ????????? ??????? ????
+ALTER TABLE data_report_ready
+ADD FOREIGN KEY (report_id) 
+REFERENCES reports (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE;
+
+ALTER TABLE data_report_ready
+ADD FOREIGN KEY (data_type_id) 
+REFERENCES data_types (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+ALTER TABLE data_report_ready
+ADD FOREIGN KEY (account_id) 
+REFERENCES accounts (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
+
+ALTER TABLE data_report_ready
+ADD CONSTRAINT fk_cell_ext_name
+FOREIGN KEY (cell_ext_name) 
+REFERENCES cells (ext_name)
+ON DELETE CASCADE 
+ON UPDATE CASCADE; 
